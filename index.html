@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Memories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Floating hearts animation */
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 182, 193, 0.3);
+            font-size: 20px;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        /* Photo slider */
+        .slider-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            height: 400px;
+            margin-bottom: 1rem;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .slide-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fad0c4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+        }
+
+        .slide-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        .slide-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 2rem 1.5rem 1.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .slider-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .slider-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .slider-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slider-btn:disabled:hover {
+            transform: none;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .autoplay-btn {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+        }
+
+        .autoplay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.6);
+        }
+
+        .autoplay-btn.active {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .dots-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: white;
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Gallery grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Photo cards */
+        .photo-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .photo-card:nth-child(1) { animation-delay: 0.1s; }
+        .photo-card:nth-child(2) { animation-delay: 0.2s; }
+        .photo-card:nth-child(3) { animation-delay: 0.3s; }
+        .photo-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .photo-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .photo-caption {
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Upload section */
+        .upload-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .upload-button {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.6);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Modal for full-size images */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 5%;
+            border-radius: 10px;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #ff9a9e;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5); }
+            to { transform: scale(1); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating hearts -->
+    <div class="hearts" id="hearts"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>✨ Salut, c'est votre go JOE! ✨</h1>
+            <p>"Chaque photo raconte une histoire d'amour"</p>
+        </div>
+
+        <!-- Photo Slider -->
+        <div class="slider-container">
+            <h2 style="color: white; text-align: center; margin-bottom: 1.5rem;">💕 Galerie 💕</h2>
+            <div class="slider-wrapper">
+                <div class="slider" id="slider">
+                    <!-- Default slides -->
+                    <div class="slide">
+                        <div class="slide-placeholder">
+                            <span>📷<br>Ajoutez des photos pour commencer<br>votre magnifique diaporama</span>
+                        </div>
+                        <div class="slide-caption">Téléchargez votre premier souvenir pour commencer la magie</div>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-placeholder">
+                            <span>💖<br>Chaque moment<br>raconte une histoire</span>
+                        </div>
+                        <div class="slide-caption">Laissez votre histoire se dérouler en mouvement</div>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-placeholder">
+                            <span>✨<br>Des beaux<br>souvenirs en mouvement</span>
+                        </div>
+                        <div class="slide-caption">Regardez vos précieux moments prendre vie</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slider-controls">
+                <button class="slider-btn" id="prevBtn" onclick="changeSlide(-1)">‹</button>
+                <button class="autoplay-btn" id="autoplayBtn" onclick="toggleAutoplay()">▶ Auto Play</button>
+                <button class="slider-btn" id="nextBtn" onclick="changeSlide(1)">›</button>
+            </div>
+            
+            <div class="dots-container" id="dotsContainer"></div>
+        </div>
+
+        <!-- Photo gallery -->
+        <div class="gallery" id="gallery">
+            <!-- Initial placeholder cards -->
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <span>📷 Ajoutez votre premier beau souvenir</span>
+                </div>
+                <div class="photo-caption">Cliquez sur "Ajouter une photo" pour télécharger votre image préférée</div>
+            </div>
+            
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <span>💕 Moments précieux </span>
+                </div>
+                <div class="photo-caption">Chaque moment est parfait</div>
+            </div>
+            
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <span>🌟 Votre sourire radieux</span>
+                </div>
+                <div class="photo-caption">La lumière qui illumine le monde</div>
+            </div>
+        </div>
+
+        <!-- Upload section -->
+        <div class="upload-section">
+            <h2 style="color: white; margin-bottom: 1rem;">Ajoutez Plus de Beaux Souvenirs</h2>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;">
+                Téléchargez des photos pour créer votre galerie personnalisée <br>
+                <small>✨ Les photos seront enregistrées pour toujours ✨</small>
+            </p>
+            <input type="file" id="fileInput" accept="image/*" multiple>
+            <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                📸 Ajouter des Photos
+            </button>
+            <div style="margin-top: 1rem;">
+                <button class="upload-button" onclick="clearAllPhotos()" style="background: linear-gradient(45deg, #ff6b6b, #ee5a52); margin-left: 1rem;">
+                    🗑️ Supprimer Tout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for full-size images -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script>
+        // Create floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '💖';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            document.getElementById('hearts').appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 8000);
+        }
+
+        // Create hearts every 2 seconds
+        setInterval(createHeart, 2000);
+
+        // Slider functionality
+        let currentSlide = 0;
+        let sliderPhotos = [];
+        let autoplayInterval = null;
+        let isAutoplay = false;
+
+        function initializeSlider() {
+            updateSliderDots();
+            updateSliderControls();
+        }
+
+        function addPhotoToSlider(imageSrc, fileName) {
+            sliderPhotos.push({src: imageSrc, name: fileName});
+            
+            // If this is the first real photo, clear placeholder slides
+            if (sliderPhotos.length === 1) {
+                document.getElementById('slider').innerHTML = '';
+                currentSlide = 0;
+            }
+            
+            const slider = document.getElementById('slider');
+            const slide = document.createElement('div');
+            slide.className = 'slide';
+            slide.onclick = () => openModal(imageSrc);
+            
+            slide.innerHTML = `
+                <img src="${imageSrc}" alt="${fileName}">
+                <div class="slide-caption">${fileName}</div>
+            `;
+            
+            slider.appendChild(slide);
+            updateSliderDots();
+            updateSliderControls();
+            
+            // Auto-advance to the new photo
+            if (sliderPhotos.length > 1) {
+                currentSlide = sliderPhotos.length - 1;
+                updateSliderPosition();
+            }
+        }
+
+        function changeSlide(direction) {
+            if (sliderPhotos.length === 0) return;
+            
+            currentSlide += direction;
+            
+            if (currentSlide >= sliderPhotos.length) {
+                currentSlide = 0;
+            } else if (currentSlide < 0) {
+                currentSlide = sliderPhotos.length - 1;
+            }
+            
+            updateSliderPosition();
+        }
+
+        function goToSlide(index) {
+            if (sliderPhotos.length === 0) return;
+            
+            currentSlide = index;
+            updateSliderPosition();
+        }
+
+        function updateSliderPosition() {
+            const slider = document.getElementById('slider');
+            const translateX = -currentSlide * 100;
+            slider.style.transform = `translateX(${translateX}%)`;
+            
+            // Update active dot
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function updateSliderDots() {
+            const dotsContainer = document.getElementById('dotsContainer');
+            dotsContainer.innerHTML = '';
+            
+            const slideCount = sliderPhotos.length > 0 ? sliderPhotos.length : 3;
+            
+            for (let i = 0; i < slideCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                if (i === currentSlide) dot.classList.add('active');
+                dot.onclick = () => goToSlide(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateSliderControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const hasPhotos = sliderPhotos.length > 0;
+            
+            prevBtn.disabled = !hasPhotos;
+            nextBtn.disabled = !hasPhotos;
+        }
+
+        function toggleAutoplay() {
+            const btn = document.getElementById('autoplayBtn');
+            
+            if (isAutoplay) {
+                clearInterval(autoplayInterval);
+                isAutoplay = false;
+                btn.textContent = '▶ Auto Play';
+                btn.classList.remove('active');
+            } else {
+                if (sliderPhotos.length > 1) {
+                    autoplayInterval = setInterval(() => {
+                        changeSlide(1);
+                    }, 3000);
+                    isAutoplay = true;
+                    btn.textContent = '⏸ Pause';
+                    btn.classList.add('active');
+                }
+            }
+        }
+
+        // Handle file upload and storage
+        let uploadedPhotos = [];
+        
+        // Load photos from storage when page loads
+        function loadStoredPhotos() {
+            try {
+                const storedPhotos = JSON.parse(localStorage.getItem('girlfriendPhotos') || '[]');
+                storedPhotos.forEach(photo => {
+                    addPhotoToSlider(photo.src, photo.name);
+                    addPhotoToGallery(photo.src, photo.name);
+                });
+            } catch (error) {
+                console.log('No stored photos found or error loading photos');
+            }
+        }
+        
+        // Save photos to storage
+        function savePhotosToStorage() {
+            try {
+                localStorage.setItem('girlfriendPhotos', JSON.stringify(uploadedPhotos));
+            } catch (error) {
+                console.log('Error saving photos to storage');
+            }
+        }
+        
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    addPhotoToSlider(e.target.result, file.name);
+                    addPhotoToGallery(e.target.result, file.name);
+                    savePhotosToStorage(); // Save after adding each photo
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function addPhotoToGallery(imageSrc, fileName) {
+            const gallery = document.getElementById('gallery');
+            
+            // Remove placeholder cards if this is the first upload
+            if (uploadedPhotos.length === 0) {
+                gallery.innerHTML = '';
+            }
+            
+            const photoCard = document.createElement('div');
+            photoCard.className = 'photo-card';
+            photoCard.style.animationDelay = (uploadedPhotos.length * 0.1) + 's';
+            
+            photoCard.innerHTML = `
+                <div style="width: 100%; height: 250px; border-radius: 15px; overflow: hidden; margin-bottom: 1rem; cursor: pointer; position: relative;">
+                    <img src="${imageSrc}" 
+                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;"
+                         onmouseover="this.style.transform='scale(1.05)'"
+                         onmouseout="this.style.transform='scale(1)'"
+                         onclick="openModal('${imageSrc}')">
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease;"
+                         onclick="removePhoto(this, '${fileName}')"
+                         onmouseover="this.style.background='rgba(255,100,100,0.3)'"
+                         onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        <span style="color: white; font-size: 18px;">×</span>
+                    </div>
+                </div>
+                <div class="photo-caption">${fileName}</div>
+            `;
+            
+            gallery.appendChild(photoCard);
+            uploadedPhotos.push({src: imageSrc, name: fileName});
+        }
+
+        function removePhoto(element, fileName) {
+            const photoCard = element.closest('.photo-card');
+            photoCard.style.animation = 'fadeOut 0.3s ease-out forwards';
+            
+            // Remove from slider
+            const photoIndex = sliderPhotos.findIndex(photo => photo.name === fileName);
+            if (photoIndex > -1) {
+                sliderPhotos.splice(photoIndex, 1);
+                
+                // Rebuild slider
+                const slider = document.getElementById('slider');
+                slider.innerHTML = '';
+                
+                if (sliderPhotos.length === 0) {
+                    // Add placeholder slides back
+                    slider.innerHTML = `
+                        <div class="slide">
+                            <div class="slide-placeholder">
+                                <span>📷<br>Add photos to start<br>your beautiful slideshow</span>
+                            </div>
+                            <div class="slide-caption">Upload your first memory to begin the magic</div>
+                        </div>
+                        <div class="slide">
+                            <div class="slide-placeholder">
+                                <span>💖<br>Every moment<br>tells a story</span>
+                            </div>
+                            <div class="slide-caption">Let your love story unfold in motion</div>
+                        </div>
+                        <div class="slide">
+                            <div class="slide-placeholder">
+                                <span>✨<br>Memories in<br>beautiful motion</span>
+                            </div>
+                            <div class="slide-caption">Watch your precious moments come alive</div>
+                        </div>
+                    `;
+                    currentSlide = 0;
+                    clearInterval(autoplayInterval);
+                    isAutoplay = false;
+                    document.getElementById('autoplayBtn').textContent = '▶ Auto Play';
+                    document.getElementById('autoplayBtn').classList.remove('active');
+                } else {
+                    // Rebuild with remaining photos
+                    sliderPhotos.forEach(photo => {
+                        const slide = document.createElement('div');
+                        slide.className = 'slide';
+                        slide.onclick = () => openModal(photo.src);
+                        slide.innerHTML = `
+                            <img src="${photo.src}" alt="${photo.name}">
+                            <div class="slide-caption">${photo.name}</div>
+                        `;
+                        slider.appendChild(slide);
+                    });
+                    
+                    // Adjust current slide if necessary
+                    if (currentSlide >= sliderPhotos.length) {
+                        currentSlide = sliderPhotos.length - 1;
+                    }
+                }
+                
+                updateSliderPosition();
+                updateSliderDots();
+                updateSliderControls();
+            }
+            
+            setTimeout(() => {
+                photoCard.remove();
+                uploadedPhotos = uploadedPhotos.filter(photo => photo.name !== fileName);
+                savePhotosToStorage(); // Save after removing photo
+                
+                // Add placeholder cards back if no photos remain
+                if (uploadedPhotos.length === 0) {
+                    const gallery = document.getElementById('gallery');
+                    gallery.innerHTML = `
+                        <div class="photo-card">
+                            <div class="photo-placeholder">
+                                <span>📷 Add your first beautiful memory</span>
+                            </div>
+                            <div class="photo-caption">Click "Add Photo" to upload your favorite picture</div>
+                        </div>
+                        
+                        <div class="photo-card">
+                            <div class="photo-placeholder">
+                                <span>💕 Cherished moments together</span>
+                            </div>
+                            <div class="photo-caption">Every moment with you is picture perfect</div>
+                        </div>
+                        
+                        <div class="photo-card">
+                            <div class="photo-placeholder">
+                                <span>🌟 Your radiant smile</span>
+                            </div>
+                            <div class="photo-caption">The light that brightens my world</div>
+                        </div>
+                    `;
+                }
+            }, 300);
+        }
+
+        // Clear all photos function
+        function clearAllPhotos() {
+            if (confirm('Are you sure you want to remove all photos? This cannot be undone.')) {
+                // Clear storage
+                localStorage.removeItem('girlfriendPhotos');
+                
+                // Reset arrays
+                uploadedPhotos = [];
+                sliderPhotos = [];
+                
+                // Stop autoplay
+                clearInterval(autoplayInterval);
+                isAutoplay = false;
+                document.getElementById('autoplayBtn').textContent = '▶ Auto Play';
+                document.getElementById('autoplayBtn').classList.remove('active');
+                
+                // Reset slider
+                const slider = document.getElementById('slider');
+                slider.innerHTML = `
+                    <div class="slide">
+                        <div class="slide-placeholder">
+                            <span>📷<br>Add photos to start<br>your beautiful slideshow</span>
+                        </div>
+                        <div class="slide-caption">Upload your first memory to begin the magic</div>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-placeholder">
+                            <span>💖<br>Every moment<br>tells a story</span>
+                        </div>
+                        <div class="slide-caption">Let your love story unfold in motion</div>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-placeholder">
+                            <span>✨<br>Memories in<br>beautiful motion</span>
+                        </div>
+                        <div class="slide-caption">Watch your precious moments come alive</div>
+                    </div>
+                `;
+                currentSlide = 0;
+                
+                // Reset gallery
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = `
+                    <div class="photo-card">
+                        <div class="photo-placeholder">
+                            <span>📷 Add your first beautiful memory</span>
+                        </div>
+                        <div class="photo-caption">Click "Add Photo" to upload your favorite picture</div>
+                    </div>
+                    
+                    <div class="photo-card">
+                        <div class="photo-placeholder">
+                            <span>💕 Cherished moments together</span>
+                        </div>
+                        <div class="photo-caption">Every moment with you is picture perfect</div>
+                    </div>
+                    
+                    <div class="photo-card">
+                        <div class="photo-placeholder">
+                            <span>🌟 Your radiant smile</span>
+                        </div>
+                        <div class="photo-caption">The light that brightens my world</div>
+                    </div>
+                `;
+                
+                // Update controls
+                updateSliderPosition();
+                updateSliderDots();
+                updateSliderControls();
+            }
+        }
+
+        // Initialize slider and load stored photos on page load
+        window.addEventListener('load', function() {
+            initializeSlider();
+            loadStoredPhotos();
+        });
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside the image
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Add fadeOut animation for CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.8); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add some sparkle effect on hover
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() > 0.98) {
+                createSparkle(e.clientX, e.clientY);
+            }
+        });
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.style.position = 'fixed';
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            sparkle.style.color = '#ffd700';
+            sparkle.style.fontSize = '12px';
+            sparkle.style.pointerEvents = 'none';
+            sparkle.style.zIndex = '999';
+            sparkle.innerHTML = '✨';
+            sparkle.style.animation = 'sparkleAnim 1s ease-out forwards';
+            document.body.appendChild(sparkle);
+
+            setTimeout(() => sparkle.remove(), 1000);
+        }
+
+        // Add sparkle animation
+        const sparkleStyle = document.createElement('style');
+        sparkleStyle.textContent = `
+            @keyframes sparkleAnim {
+                0% { opacity: 1; transform: scale(0) rotate(0deg); }
+                50% { opacity: 1; transform: scale(1) rotate(180deg); }
+                100% { opacity: 0; transform: scale(0) rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(sparkleStyle);
+    </script>
+</body>
+</html>
